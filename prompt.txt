@@ -1,0 +1,3 @@
+cmdb
+.
+Create at least 12 tables (models)

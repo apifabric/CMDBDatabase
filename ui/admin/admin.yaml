@@ -1,0 +1,319 @@
+about:
+  date: January 29, 2025 09:55:37
+  recent_changes: works with modified safrs-react-admin
+  version: 0.0.0
+api_root: '{http_type}://{swagger_host}:{port}/{api}'
+authentication: '{system-default}'
+info:
+  number_relationships: 10
+  number_tables: 12
+info_toggle_checked: true
+resources:
+  AccessLog:
+    attributes:
+    - label: ' id*'
+      name: id
+      search: true
+      sort: true
+    - name: user_account_id
+    - name: login_time
+      type: DATETIME
+    - name: logout_time
+      type: DATETIME
+    description: Tracks user logins and logouts.
+    info_list: Tracks user logins and logouts.
+    tab_groups:
+    - direction: toone
+      fks:
+      - user_account_id
+      name: user_account
+      resource: UserAccount
+    type: AccessLog
+    user_key: id
+  Application:
+    attributes:
+    - label: ' name*'
+      name: name
+      required: true
+      search: true
+      sort: true
+    - name: vendor_id
+    - name: version
+    - name: id
+    description: Details of applications including version and vendor.
+    info_list: Details of applications including version and vendor.
+    tab_groups:
+    - direction: toone
+      fks:
+      - vendor_id
+      name: vendor
+      resource: Vendor
+    type: Application
+    user_key: name
+  ConfigurationItem:
+    attributes:
+    - label: ' name*'
+      name: name
+      required: true
+      search: true
+      sort: true
+    - name: type_id
+    - name: vendor_id
+    - name: id
+    description: Represents different configuration items related to devices.
+    info_list: Represents different configuration items related to devices.
+    tab_groups:
+    - direction: toone
+      fks:
+      - type_id
+      name: type
+      resource: DeviceType
+    - direction: toone
+      fks:
+      - vendor_id
+      name: vendor
+      resource: Vendor
+    type: ConfigurationItem
+    user_key: name
+  DeviceType:
+    attributes:
+    - label: ' type_name*'
+      name: type_name
+      search: true
+      sort: true
+    - name: id
+    description: Different types of devices within the network.
+    info_list: Different types of devices within the network.
+    tab_groups:
+    - direction: tomany
+      fks:
+      - type_id
+      name: ConfigurationItemList
+      resource: ConfigurationItem
+    type: DeviceType
+    user_key: type_name
+  Incident:
+    attributes:
+    - label: ' description*'
+      name: description
+      search: true
+      sort: true
+    - name: server_id
+    - name: report_time
+      type: DATETIME
+    - name: resolution_time
+      type: DATETIME
+    - name: id
+    description: Records incidents occurring on the server systems.
+    info_list: Records incidents occurring on the server systems.
+    tab_groups:
+    - direction: toone
+      fks:
+      - server_id
+      name: server
+      resource: Server
+    type: Incident
+    user_key: description
+  Location:
+    attributes:
+    - label: ' name*'
+      name: name
+      required: true
+      search: true
+      sort: true
+    - name: address
+    - name: id
+    description: Represents a physical or logical location.
+    info_list: Represents a physical or logical location.
+    tab_groups:
+    - direction: tomany
+      fks:
+      - location_id
+      name: ServerList
+      resource: Server
+    type: Location
+    user_key: name
+  MaintenanceSchedule:
+    attributes:
+    - label: ' id*'
+      name: id
+      search: true
+      sort: true
+    - name: server_id
+    - name: planned_date
+      type: DATETIME
+    description: Scheduling of maintenance activities on servers.
+    info_list: Scheduling of maintenance activities on servers.
+    tab_groups:
+    - direction: toone
+      fks:
+      - server_id
+      name: server
+      resource: Server
+    type: MaintenanceSchedule
+    user_key: id
+  NetworkInterface:
+    attributes:
+    - label: ' id*'
+      name: id
+      search: true
+      sort: true
+    - name: server_id
+    - name: ip_address
+      required: true
+    - name: mac_address
+      required: true
+    description: Network interface cards for the servers.
+    info_list: Network interface cards for the servers.
+    tab_groups:
+    - direction: toone
+      fks:
+      - server_id
+      name: server
+      resource: Server
+    type: NetworkInterface
+    user_key: id
+  OperatingSystem:
+    attributes:
+    - label: ' name*'
+      name: name
+      required: true
+      search: true
+      sort: true
+    - name: vendor_id
+    - name: version
+    - name: id
+    description: Details about various operating systems used on servers.
+    info_list: Details about various operating systems used on servers.
+    tab_groups:
+    - direction: toone
+      fks:
+      - vendor_id
+      name: vendor
+      resource: Vendor
+    type: OperatingSystem
+    user_key: name
+  Server:
+    attributes:
+    - label: ' hostname*'
+      name: hostname
+      required: true
+      search: true
+      sort: true
+    - name: location_id
+    - name: ip_address
+      required: true
+    - name: id
+    description: Stores information about servers in the CMDB.
+    info_list: Stores information about servers in the CMDB.
+    tab_groups:
+    - direction: tomany
+      fks:
+      - server_id
+      name: IncidentList
+      resource: Incident
+    - direction: tomany
+      fks:
+      - server_id
+      name: MaintenanceScheduleList
+      resource: MaintenanceSchedule
+    - direction: tomany
+      fks:
+      - server_id
+      name: NetworkInterfaceList
+      resource: NetworkInterface
+    - direction: tomany
+      fks:
+      - server_id
+      name: UserAccountList
+      resource: UserAccount
+    - direction: toone
+      fks:
+      - location_id
+      name: location
+      resource: Location
+    type: Server
+    user_key: hostname
+  UserAccount:
+    attributes:
+    - label: ' username*'
+      name: username
+      required: true
+      search: true
+      sort: true
+    - name: server_id
+    - name: id
+    description: User accounts associated with servers.
+    info_list: User accounts associated with servers.
+    tab_groups:
+    - direction: tomany
+      fks:
+      - user_account_id
+      name: AccessLogList
+      resource: AccessLog
+    - direction: toone
+      fks:
+      - server_id
+      name: server
+      resource: Server
+    type: UserAccount
+    user_key: username
+  Vendor:
+    attributes:
+    - label: ' name*'
+      name: name
+      required: true
+      search: true
+      sort: true
+    - name: id
+    description: Information about software vendors.
+    info_list: Information about software vendors.
+    tab_groups:
+    - direction: tomany
+      fks:
+      - vendor_id
+      name: ApplicationList
+      resource: Application
+    - direction: tomany
+      fks:
+      - vendor_id
+      name: ConfigurationItemList
+      resource: ConfigurationItem
+    - direction: tomany
+      fks:
+      - vendor_id
+      name: OperatingSystemList
+      resource: OperatingSystem
+    type: Vendor
+    user_key: name
+settings:
+  HomeJS: /admin-app/home.js
+  max_list_columns: 8
+  style_guide:
+    applicationLocales:
+    - en
+    - es
+    currency_symbol: $
+    currency_symbol_position: left
+    date_format: LL
+    decimal_max: '1000000000'
+    decimal_min: '0'
+    decimal_separator: .
+    detail_mode: tab
+    edit_on_mode: dblclick
+    exclude_listpicker: false
+    include_translation: 'false'
+    keycloak_client_id: alsclient
+    keycloak_realm: kcals
+    keycloak_url: http://localhost:8080
+    locale: en
+    max_decimal_digits: '4'
+    min_decimal_digits: '2'
+    new_mode: dialog
+    pick_style: list
+    row_height: small,
+    serviceType: OntimizeEE
+    startSessionPath: /auth/login
+    style: light
+    thousand_separator: ','
+    use_keycloak: 'false'

@@ -1,0 +1,112 @@
+// Copy this text, paste to https://dbdiagram.io/d
+// Or, https://databasediagram.com/app
+// Or, view in VSCode with extension: "DBML Live Preview"
+
+Project DBML {
+  Note: '''
+AccessLog: Tracks user logins and logouts.
+UserAccount: User accounts associated with servers.
+Application: Details of applications including version and vendor.
+Vendor: Information about software vendors.
+ConfigurationItem: Represents different configuration items related to devices.
+DeviceType: Different types of devices within the network.
+Incident: Records incidents occurring on the server systems.
+Server: Stores information about servers in the CMDB.
+Location: Represents a physical or logical location.
+MaintenanceSchedule: Scheduling of maintenance activities on servers.
+NetworkInterface: Network interface cards for the servers.
+OperatingSystem: Details about various operating systems used on servers.
+'''
+}
+
+Table AccessLog {
+    id INTEGER [primary key]
+    user_account_id INTEGER 
+    login_time DATETIME 
+    logout_time DATETIME 
+    }
+
+Table UserAccount {
+    id INTEGER [primary key]
+    username VARCHAR 
+    server_id INTEGER 
+    }
+
+Table Application {
+    id INTEGER [primary key]
+    name VARCHAR 
+    version VARCHAR 
+    vendor_id INTEGER 
+    }
+
+Table Vendor {
+    id INTEGER [primary key]
+    name VARCHAR 
+    }
+
+Table ConfigurationItem {
+    id INTEGER [primary key]
+    name VARCHAR 
+    type_id INTEGER 
+    vendor_id INTEGER 
+    }
+
+Table DeviceType {
+    id INTEGER [primary key]
+    type_name VARCHAR 
+    }
+
+Table Incident {
+    id INTEGER [primary key]
+    description VARCHAR 
+    report_time DATETIME 
+    resolution_time DATETIME 
+    server_id INTEGER 
+    }
+
+Table Server {
+    id INTEGER [primary key]
+    hostname VARCHAR 
+    ip_address VARCHAR 
+    location_id INTEGER 
+    }
+
+Table Location {
+    id INTEGER [primary key]
+    name VARCHAR 
+    address VARCHAR 
+    }
+
+Table MaintenanceSchedule {
+    id INTEGER [primary key]
+    server_id INTEGER 
+    planned_date DATETIME 
+    }
+
+Table NetworkInterface {
+    id INTEGER [primary key]
+    ip_address VARCHAR 
+    mac_address VARCHAR 
+    server_id INTEGER 
+    }
+
+Table OperatingSystem {
+    id INTEGER [primary key]
+    name VARCHAR 
+    version VARCHAR 
+    vendor_id INTEGER 
+    }
+
+
+
+// Relationships
+    Ref: AccessLog.(user_account_id) < UserAccount.(id)
+    Ref: UserAccount.(server_id) < Server.(id)
+    Ref: Application.(vendor_id) < Vendor.(id)
+    Ref: ConfigurationItem.(type_id) < DeviceType.(id)
+    Ref: ConfigurationItem.(vendor_id) < Vendor.(id)
+    Ref: Incident.(server_id) < Server.(id)
+    Ref: Server.(location_id) < Location.(id)
+    Ref: MaintenanceSchedule.(server_id) < Server.(id)
+    Ref: NetworkInterface.(server_id) < Server.(id)
+    Ref: OperatingSystem.(vendor_id) < Vendor.(id)
