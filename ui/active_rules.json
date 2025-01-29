@@ -1,0 +1,22 @@
+[
+    {
+        "name": "ServerCount",
+        "description": "Total count of servers for each location.",
+        "use_case": "General",
+        "code": "Sum(Location.server_count, Server.id)",
+        "error": null,
+        "status": "accepted",
+        "entity": "Location",
+        "id": "01JJRQT1K6V6FMJPNTZP5DEDQ9"
+    },
+    {
+        "name": "ApplicationVendorCount",
+        "description": "Total applications provided by each vendor.",
+        "use_case": "General",
+        "code": "Sum(Vendor.application_count, Application.id)",
+        "error": null,
+        "status": "accepted",
+        "entity": "Vendor",
+        "id": "01JJRQT1KDAC2YJXVNB2907K10"
+    }
+]

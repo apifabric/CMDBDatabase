@@ -1,0 +1,74 @@
+{
+    "rules": [
+        {
+            "name": "ServerCount",
+            "description": "Total count of servers for each location.",
+            "use_case": "General",
+            "code": "Sum(Location.server_count, Server.id)",
+            "error": null,
+            "status": "accepted",
+            "entity": "Location",
+            "id": "01JJRQT1K6V6FMJPNTZP5DEDQ9"
+        },
+        {
+            "name": "ApplicationVendorCount",
+            "description": "Total applications provided by each vendor.",
+            "use_case": "General",
+            "code": "Sum(Vendor.application_count, Application.id)",
+            "error": null,
+            "status": "accepted",
+            "entity": "Vendor",
+            "id": "01JJRQT1KDAC2YJXVNB2907K10"
+        }
+    ],
+    "models": [
+        {
+            "classname": "DeviceType",
+            "code": "class DeviceType(Base):  # type: ignore\n    \"\"\"\n    description: Different types of devices within the network.\n    \"\"\"\n    __tablename__ = 'device_type'\n    _s_collection_name = 'DeviceType'  # type: ignore\n\n    id = Column(Integer, primary_key=True)\n    type_name = Column(String)\n\n    # parent relationships (access parent)\n\n    # child relationships (access children)\n    ConfigurationItemList : Mapped[List[\"ConfigurationItem\"]] = relationship(back_populates=\"type\")"
+        },
+        {
+            "classname": "Location",
+            "code": "class Location(Base):  # type: ignore\n    \"\"\"\n    description: Represents a physical or logical location.\n    \"\"\"\n    __tablename__ = 'location'\n    _s_collection_name = 'Location'  # type: ignore\n\n    id = Column(Integer, primary_key=True)\n    name = Column(String, nullable=False)\n    address = Column(String)\n\n    # parent relationships (access parent)\n\n    # child relationships (access children)\n    ServerList : Mapped[List[\"Server\"]] = relationship(back_populates=\"location\")"
+        },
+        {
+            "classname": "Vendor",
+            "code": "class Vendor(Base):  # type: ignore\n    \"\"\"\n    description: Information about software vendors.\n    \"\"\"\n    __tablename__ = 'vendor'\n    _s_collection_name = 'Vendor'  # type: ignore\n\n    id = Column(Integer, primary_key=True)\n    name = Column(String, nullable=False)\n\n    # parent relationships (access parent)\n\n    # child relationships (access children)\n    ApplicationList : Mapped[List[\"Application\"]] = relationship(back_populates=\"vendor\")\n    ConfigurationItemList : Mapped[List[\"ConfigurationItem\"]] = relationship(back_populates=\"vendor\")\n    OperatingSystemList : Mapped[List[\"OperatingSystem\"]] = relationship(back_populates=\"vendor\")"
+        },
+        {
+            "classname": "Application",
+            "code": "class Application(Base):  # type: ignore\n    \"\"\"\n    description: Details of applications including version and vendor.\n    \"\"\"\n    __tablename__ = 'application'\n    _s_collection_name = 'Application'  # type: ignore\n\n    id = Column(Integer, primary_key=True)\n    name = Column(String, nullable=False)\n    version = Column(String)\n    vendor_id = Column(ForeignKey('vendor.id'))\n\n    # parent relationships (access parent)\n    vendor : Mapped[\"Vendor\"] = relationship(back_populates=(\"ApplicationList\"))"
+        },
+        {
+            "classname": "ConfigurationItem",
+            "code": "class ConfigurationItem(Base):  # type: ignore\n    \"\"\"\n    description: Represents different configuration items related to devices.\n    \"\"\"\n    __tablename__ = 'configuration_item'\n    _s_collection_name = 'ConfigurationItem'  # type: ignore\n\n    id = Column(Integer, primary_key=True)\n    name = Column(String, nullable=False)\n    type_id = Column(ForeignKey('device_type.id'))\n    vendor_id = Column(ForeignKey('vendor.id'))\n\n    # parent relationships (access parent)\n    type : Mapped[\"DeviceType\"] = relationship(back_populates=(\"ConfigurationItemList\"))\n    vendor : Mapped[\"Vendor\"] = relationship(back_populates=(\"ConfigurationItemList\"))"
+        },
+        {
+            "classname": "OperatingSystem",
+            "code": "class OperatingSystem(Base):  # type: ignore\n    \"\"\"\n    description: Details about various operating systems used on servers.\n    \"\"\"\n    __tablename__ = 'operating_system'\n    _s_collection_name = 'OperatingSystem'  # type: ignore\n\n    id = Column(Integer, primary_key=True)\n    name = Column(String, nullable=False)\n    version = Column(String)\n    vendor_id = Column(ForeignKey('vendor.id'))\n\n    # parent relationships (access parent)\n    vendor : Mapped[\"Vendor\"] = relationship(back_populates=(\"OperatingSystemList\"))"
+        },
+        {
+            "classname": "Server",
+            "code": "class Server(Base):  # type: ignore\n    \"\"\"\n    description: Stores information about servers in the CMDB.\n    \"\"\"\n    __tablename__ = 'server'\n    _s_collection_name = 'Server'  # type: ignore\n\n    id = Column(Integer, primary_key=True)\n    hostname = Column(String, nullable=False)\n    ip_address = Column(String, nullable=False)\n    location_id = Column(ForeignKey('location.id'))\n\n    # parent relationships (access parent)\n    location : Mapped[\"Location\"] = relationship(back_populates=(\"ServerList\"))\n\n    # child relationships (access children)\n    IncidentList : Mapped[List[\"Incident\"]] = relationship(back_populates=\"server\")\n    MaintenanceScheduleList : Mapped[List[\"MaintenanceSchedule\"]] = relationship(back_populates=\"server\")\n    NetworkInterfaceList : Mapped[List[\"NetworkInterface\"]] = relationship(back_populates=\"server\")\n    UserAccountList : Mapped[List[\"UserAccount\"]] = relationship(back_populates=\"server\")"
+        },
+        {
+            "classname": "Incident",
+            "code": "class Incident(Base):  # type: ignore\n    \"\"\"\n    description: Records incidents occurring on the server systems.\n    \"\"\"\n    __tablename__ = 'incident'\n    _s_collection_name = 'Incident'  # type: ignore\n\n    id = Column(Integer, primary_key=True)\n    description = Column(String)\n    report_time = Column(DateTime)\n    resolution_time = Column(DateTime)\n    server_id = Column(ForeignKey('server.id'))\n\n    # parent relationships (access parent)\n    server : Mapped[\"Server\"] = relationship(back_populates=(\"IncidentList\"))"
+        },
+        {
+            "classname": "MaintenanceSchedule",
+            "code": "class MaintenanceSchedule(Base):  # type: ignore\n    \"\"\"\n    description: Scheduling of maintenance activities on servers.\n    \"\"\"\n    __tablename__ = 'maintenance_schedule'\n    _s_collection_name = 'MaintenanceSchedule'  # type: ignore\n\n    id = Column(Integer, primary_key=True)\n    server_id = Column(ForeignKey('server.id'))\n    planned_date = Column(DateTime)\n\n    # parent relationships (access parent)\n    server : Mapped[\"Server\"] = relationship(back_populates=(\"MaintenanceScheduleList\"))"
+        },
+        {
+            "classname": "NetworkInterface",
+            "code": "class NetworkInterface(Base):  # type: ignore\n    \"\"\"\n    description: Network interface cards for the servers.\n    \"\"\"\n    __tablename__ = 'network_interface'\n    _s_collection_name = 'NetworkInterface'  # type: ignore\n\n    id = Column(Integer, primary_key=True)\n    ip_address = Column(String, nullable=False)\n    mac_address = Column(String, nullable=False)\n    server_id = Column(ForeignKey('server.id'))\n\n    # parent relationships (access parent)\n    server : Mapped[\"Server\"] = relationship(back_populates=(\"NetworkInterfaceList\"))"
+        },
+        {
+            "classname": "UserAccount",
+            "code": "class UserAccount(Base):  # type: ignore\n    \"\"\"\n    description: User accounts associated with servers.\n    \"\"\"\n    __tablename__ = 'user_account'\n    _s_collection_name = 'UserAccount'  # type: ignore\n\n    id = Column(Integer, primary_key=True)\n    username = Column(String, nullable=False)\n    server_id = Column(ForeignKey('server.id'))\n\n    # parent relationships (access parent)\n    server : Mapped[\"Server\"] = relationship(back_populates=(\"UserAccountList\"))\n\n    # child relationships (access children)\n    AccessLogList : Mapped[List[\"AccessLog\"]] = relationship(back_populates=\"user_account\")"
+        },
+        {
+            "classname": "AccessLog",
+            "code": "class AccessLog(Base):  # type: ignore\n    \"\"\"\n    description: Tracks user logins and logouts.\n    \"\"\"\n    __tablename__ = 'access_log'\n    _s_collection_name = 'AccessLog'  # type: ignore\n\n    id = Column(Integer, primary_key=True)\n    user_account_id = Column(ForeignKey('user_account.id'))\n    login_time = Column(DateTime)\n    logout_time = Column(DateTime)\n\n    # parent relationships (access parent)\n    user_account : Mapped[\"UserAccount\"] = relationship(back_populates=(\"AccessLogList\"))"
+        }
+    ]
+}
